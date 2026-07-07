@@ -841,3 +841,58 @@ body {
 .notification-item.salary_received {
   border-left-color: var(--accent-emerald);
 }
+
+/* ==========================================
+   FORM CONTROLS (Obsidian Dark Styles)
+   ========================================== */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 0.85rem 1.25rem !important;
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  font-size: 0.95rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: var(--transition) !important;
+}
+
+.form-control:focus {
+  border-color: var(--accent-gold) !important;
+  box-shadow: 0 0 10px var(--accent-gold-glow) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted) !important;
+}
+
+select.form-control {
+  cursor: pointer;
+}
+
+select.form-control option {
+  background-color: #0b0c13 !important;
+  color: var(--text-primary) !important;
+}
+
+/* Adjust calendar date picker icon in Webkit browsers to be dark-gold themed */
+.form-control[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) sepia(50%) saturate(300%) hue-rotate(330deg) !important;
+  cursor: pointer !important;
+}
+

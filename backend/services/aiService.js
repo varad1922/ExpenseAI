@@ -152,16 +152,6 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
   const client = getOpenAIClient();
 
   const exceededCount = budgetsStatus.filter(b => b.isExceeded).length;
-  const budgetRatio = income > 0 ? (expense / income) : 1;
-  
-  // Calculate baseline score
-  let score = 75;
-  if (budgetRatio <= 0.5) score += 15;
-  else if (budgetRatio <= 0.8) score += 5;
-  else if (budgetRatio > 1) score -= 25;
-
-  score -= exceededCount * 5;
-  score = Math.max(10, Math.min(100, score));
 
   if (client) {
     try {
@@ -170,6 +160,8 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
         Total Income: ₹${income.toFixed(2)}
         Total Expenses: ₹${expense.toFixed(2)}
         Number of exceeded category budgets: ${exceededCount}
+        
+        CRITICAL: If both Total Income and Total Expenses are exactly 0, the score MUST be 0 and the strengths/improvements should explain that no transactions are recorded yet.
         
         Return a JSON object with:
         1. "score": An integer between 0 and 100.
@@ -195,9 +187,44 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
   const strengths = [];
   const improvements = [];
 
-  if (income > 0 && expense / income < 0.5) {
+  // Edge case: No data at all
+  if (income === 0 && expense === 0) {
+    return {
+      score: 0,
+      strengths: ['Financial Portal Initialized: Your tracking environment is ready.'],
+      improvements: [
+        'Record Monthly Income: Set your base earnings limit to calculate savings ratios.',
+        'Track First Expense: Log your recent payouts or purchases to calculate score trends.'
+      ]
+    };
+  }
+
+  // Edge case: Expenses but no income
+  if (income === 0 && expense > 0) {
+    return {
+      score: 10,
+      strengths: ['Expense Recording Active: You are logging payouts diligently.'],
+      improvements: [
+        'No Income Registered: Add your salary or investments source to offset deficit.',
+        'Limit Non-Essential Debts: Total balance is negative due to zero earnings context.'
+      ]
+    };
+  }
+
+  const budgetRatio = expense / income;
+  
+  // Calculate baseline score
+  let score = 75;
+  if (budgetRatio <= 0.5) score += 15;
+  else if (budgetRatio <= 0.8) score += 5;
+  else if (budgetRatio > 1) score -= 25;
+
+  score -= exceededCount * 5;
+  score = Math.max(10, Math.min(100, score));
+
+  if (budgetRatio < 0.5) {
     strengths.push('Excellent Savings Rate: You save more than 50% of your earnings.');
-  } else if (income > 0 && expense / income < 0.8) {
+  } else if (budgetRatio < 0.8) {
     strengths.push('Healthy Spending Balance: You maintain positive net savings.');
   } else {
     improvements.push('Low Net Savings: Try saving at least 20% of your income.');
