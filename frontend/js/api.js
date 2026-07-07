@@ -29,6 +29,7 @@ const API = {
     // Don't set Content-Type header if body is FormData (let browser set boundary boundary)
     if (options.body && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(options.body);
     }
 
     try {

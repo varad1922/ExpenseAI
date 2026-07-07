@@ -51,7 +51,7 @@ app.use('/api/reports', reportRoutes);
 
 // SPA Fallback for dashboard
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/html/login.html'));
+  res.redirect('/html/login.html');
 });
 
 // Centralized error handling
