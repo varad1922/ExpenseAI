@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ExpenseAI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fa-solid fa-brain-circuit"></i>
+      <span>ExpenseAI</span>
+    </div>
+    <ul class="nav-links">
+      <li class="nav-item active" data-tab="dashboard">
+        <a href="#"><i class="fa-solid fa-house-chimney"></i> Overview</a>
+      </li>
+      <li class="nav-item" data-tab="transactions">
+        <a href="#"><i class="fa-solid fa-receipt"></i> Transactions</a>
+      </li>
+      <li class="nav-item" data-tab="budgets">
+        <a href="#"><i class="fa-solid fa-wallet"></i> Budget Planner</a>
+      </li>
+      <li class="nav-item" data-tab="ai-hub">
+        <a href="#"><i class="fa-solid fa-robot"></i> AI Hub & Chat</a>
+      </li>
+      <li class="nav-item" data-tab="reports">
+        <a href="#"><i class="fa-solid fa-chart-pie"></i> Reports Center</a>
+      </li>
+    </ul>
+    <div class="sidebar-profile">
+      <div class="profile-avatar" id="userAvatar">U</div>
+      <div class="profile-details">
+        <span class="profile-name" id="userName">User Name</span>
+        <span class="profile-role" id="userRole">Member</span>
+      </div>
+      <i class="fa-solid fa-right-from-bracket logout-btn" id="logoutBtn" title="Sign Out"></i>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTAINER -->
+  <div class="main-wrapper">
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <div class="top-bar-title">
+        <h2 id="tabTitle">Overview</h2>
+      </div>
+      <div class="top-bar-actions">
+        <button class="action-btn" id="addIncomeBtn"><i class="fa-solid fa-plus"></i> Income</button>
+        <button class="action-btn primary" id="addExpenseBtn"><i class="fa-solid fa-plus"></i> Expense</button>
+        
+        <!-- Notification Bell -->
+        <div class="notification-bell" id="notifBell">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notification-badge" id="notifBadge"></span>
+          
+          <!-- Dropdown drawer -->
+          <div class="notification-drawer" id="notifDrawer">
+            <div style="display:flex; justify-content:space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+              <span style="font-weight:600; font-size:0.9rem;">Notifications</span>
+              <a href="#" id="clearNotifs" style="color:var(--accent-gold); font-size:0.8rem; text-decoration:none;">Mark read</a>
+            </div>
+            <div id="notifList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:200px; overflow-y:auto;">
+              <div style="color:var(--text-secondary); font-size:0.8rem; text-align:center; padding: 1rem 0;">No new alerts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="content-body">
+
+      <!-- ==========================================
+           TAB 1: DASHBOARD OVERVIEW
+           ========================================== -->
+      <section class="dashboard-tab active" id="tab-dashboard">
+        <!-- Stats Row -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon income"><i class="fa-solid fa-arrow-trend-up"></i></div>
+            <span class="stat-label">Total Income</span>
+            <span class="stat-value" id="dashTotalIncome">₹0.00</span>
+            <span class="stat-meta" id="dashIncomePeriod">This Month</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon expense"><i class="fa-solid fa-arrow-trend-down"></i></div>
+            <span class="stat-label">Total Expense</span>
+            <span class="stat-value" id="dashTotalExpense">₹0.00</span>
+            <span class="stat-meta" id="dashExpensePeriod">This Month</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon balance"><i class="fa-solid fa-scale-balanced"></i></div>
+            <span class="stat-label">Current Balance</span>
+            <span class="stat-value" id="dashBalance">₹0.00</span>
+            <span class="stat-meta">Net Liquid</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon savings"><i class="fa-solid fa-piggy-bank"></i></div>
+            <span class="stat-label">Savings Rate</span>
+            <span class="stat-value" id="dashSavingsRate">0%</span>
+            <span class="stat-meta" id="dashSavingsAmount">₹0.00 saved</span>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <!-- Main Chart -->
+          <div class="chart-panel">
+            <div class="panel-header">
+              <h3>Expense Breakdown by Category</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- Financial Health Score -->
+          <div class="chart-panel">
+            <div class="panel-header">
+              <h3>Financial Health</h3>
+            </div>
+            <div class="health-score-container" id="healthScoreTrigger" style="cursor: pointer;">
+              <div class="radial-score-bar" id="healthConic">
+                <span class="radial-score-value" id="healthScoreText">--</span>
+              </div>
+              <span style="font-weight:600; font-size:1rem;" id="healthStatusText">Calculating Score...</span>
+              <p style="color:var(--text-secondary); font-size:0.8rem; text-align:center; padding: 0 10px;">
+                Click here to view your core strengths and improvement areas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Summary -->
+        <div class="table-panel">
+          <div class="panel-header" style="margin-bottom: 1.5rem;">
+            <h3>Recent Transactions</h3>
+            <button class="action-btn" id="viewAllTransBtn">View All</button>
+          </div>
+          <div class="table-responsive">
+            <table class="transaction-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="recentTransactionsBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                    No transactions recorded this month.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: TRANSACTIONS MANAGEMENT
+           ========================================== -->
+      <section class="dashboard-tab" id="tab-transactions">
+        <div class="table-panel">
+          <div class="table-header-filters">
+            <input type="text" id="transSearchInput" class="search-input" placeholder="Search by details...">
+            <select id="transCategoryFilter" class="filter-select">
+              <option value="">All Categories</option>
+            </select>
+            <input type="date" id="transStartDate" class="filter-select" placeholder="Start Date">
+            <input type="date" id="transEndDate" class="filter-select" placeholder="End Date">
+            <button class="action-btn" id="clearFiltersBtn">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="transaction-table" id="fullTransTable">
+              <thead>
+                <tr>
+                  <th style="cursor:pointer;" id="sortDate">Date <i class="fa-solid fa-sort"></i></th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Payment Method</th>
+                  <th>Tags</th>
+                  <th style="cursor:pointer;" id="sortAmount">Amount <i class="fa-solid fa-sort"></i></th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsTableBody">
+                <!-- Populated via Javascript -->
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="pagination">
+            <span id="paginationInfo">Showing 0 of 0 items</span>
+            <div class="pagination-controls">
+              <button class="action-btn" id="prevPageBtn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="action-btn" id="nextPageBtn" disabled><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: BUDGET PLANNER
+           ========================================== -->
+      <section class="dashboard-tab" id="tab-budgets">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; margin-bottom: 2rem;">
+          
+          <!-- Add/Set budget form -->
+          <div class="table-panel">
+            <div class="panel-header" style="margin-bottom: 1.5rem;">
+              <h3>Set Category Budget</h3>
+            </div>
+            <form id="setBudgetForm">
+              <div style="display:flex; flex-direction:column; gap:1.25rem;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="budgetCategory">Category</label>
+                  <select id="budgetCategory" class="filter-select" style="width:100%; padding:0.85rem;" required>
+                    <option value="Total">Total Monthly Budget</option>
+                    <option value="Food">Food</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Fuel">Fuel</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Medical">Medical</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="budgetAmount">Amount Limit (INR)</label>
+                  <input type="number" id="budgetAmount" class="form-control" style="padding-left:1rem;" placeholder="e.g. 5000" min="0" required>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label for="budgetMonth">Month</label>
+                    <select id="budgetMonth" class="filter-select" style="width:100%; padding:0.85rem;" required>
+                      <option value="1">January</option>
+                      <option value="2">February</option>
+                      <option value="3">March</option>
+                      <option value="4">April</option>
+                      <option value="5">May</option>
+                      <option value="6">June</option>
+                      <option value="7">July</option>
+                      <option value="8">August</option>
+                      <option value="9">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label for="budgetYear">Year</label>
+                    <input type="number" id="budgetYear" class="form-control" style="padding-left:1rem;" value="2026" required>
+                  </div>
+                </div>
+                <button type="submit" class="action-btn primary" style="justify-content:center;">Apply Target</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- AI Budget Auto-Generator -->
+          <div class="table-panel" style="display:flex; flex-direction:column;">
+            <div class="panel-header" style="margin-bottom: 1rem;">
+              <h3>AI Budget Generator</h3>
+            </div>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom: 1.5rem;">
+              Provide your monthly earnings and let our AI algorithm generate optimized spending splits using the 50/30/20 standard.
+            </p>
+            <div style="display:flex; flex-direction:column; gap:1rem; flex-grow:1; justify-content:center;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label for="aiSalaryInput">Salary Input (INR)</label>
+                <input type="number" id="aiSalaryInput" class="form-control" style="padding-left:1rem;" placeholder="e.g. 40000" min="0">
+              </div>
+              <button type="button" class="action-btn" id="generateAIBudgetBtn" style="justify-content:center; border-color:var(--accent-indigo); color:var(--text-primary);">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-indigo);"></i> Recommend Split
+              </button>
+              <div id="aiBudgetRecommendations" style="display:none; margin-top:1rem; background:rgba(255,255,255,0.02); padding:1rem; border-radius:12px; border: 1px solid var(--panel-border);">
+                <!-- Appended recommendations -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budget usage gauges list -->
+        <div class="table-panel">
+          <div class="panel-header" style="margin-bottom: 1.5rem;">
+            <h3>Active Budgets Status</h3>
+          </div>
+          <div class="budget-status-list" id="budgetStatusList">
+            <div style="color:var(--text-secondary); text-align:center; padding: 2rem 0;">No active budget limits created.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: AI HUB & CHATBOT
+           ========================================== -->
+      <section class="dashboard-tab" id="tab-ai-hub">
+        <div class="ai-hub-grid">
+          
+          <!-- AI Assistant Chatbot -->
+          <div class="table-panel ai-chat-panel">
+            <div class="panel-header" style="border-bottom:1px solid var(--panel-border); padding-bottom: 1rem;">
+              <h3 style="display:flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> AI Finance Advisor</h3>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-bubble assistant">
+                Hello! I am your AI Expense Assistant. I can help analyze your expenses, suggest custom budgets, or audit receipt uploads. Try asking me one of the quick queries below! 💬
+              </div>
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div class="chat-suggestions">
+              <div class="suggestion-chip" data-query="Where am I overspending?">Where am I overspending?</div>
+              <div class="suggestion-chip" data-query="Suggest a budget.">Suggest a budget.</div>
+              <div class="suggestion-chip" data-query="How much did I spend on fuel last month?">Spent on fuel?</div>
+              <div class="suggestion-chip" data-query="Show expenses above 5000">Expenses > ₹5,000</div>
+            </div>
+
+            <div class="chat-input-area">
+              <input type="text" class="chat-input" id="chatInputField" placeholder="Ask financial question...">
+              <button class="action-btn primary" id="sendChatBtn" style="padding:0.75rem 1.25rem;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
+
+          <!-- AI Receipt Scan & Insights -->
+          <div style="display:flex; flex-direction:column; gap:2rem;">
+            <!-- Receipt Upload Box -->
+            <div class="table-panel">
+              <div class="panel-header" style="margin-bottom: 1rem;">
+                <h3>AI Receipt Scanner</h3>
+              </div>
+              <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom: 1.5rem;">
+                Upload purchase receipts (JPG, PNG). The scanner will extract merchant, total cost, items, and auto-record the expense.
+              </p>
+              
+              <div class="receipt-upload-box" id="uploadDropzone">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span style="font-weight:600;">Drag receipt image here or click to select</span>
+                <span style="font-size:0.75rem; color:var(--text-muted);">Max size 5MB (PNG/JPG)</span>
+                <input type="file" id="receiptFileInput" style="display:none;" accept="image/png, image/jpeg">
+              </div>
+              
+              <div id="receiptResult" style="display:none; margin-top:1.5rem; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.2); padding:1rem; border-radius:12px;">
+                <!-- Result logging -->
+              </div>
+            </div>
+
+            <!-- Spending Analysis & Suggestions -->
+            <div class="table-panel" style="flex-grow:1;">
+              <div class="panel-header" style="margin-bottom: 1rem;">
+                <h3>AI Monthly Insights</h3>
+                <button class="action-btn" id="refreshInsightsBtn" style="padding: 0.4rem 0.8rem; font-size:0.8rem;"><i class="fa-solid fa-rotate"></i> Refresh</button>
+              </div>
+              <div id="aiInsightsText" style="font-size:0.95rem; line-height:1.4; color:var(--text-secondary); margin-bottom:1.25rem;">
+                Click Refresh to extract personalized insights from your current transactions.
+              </div>
+              <ul id="aiSuggestionsList" style="display:flex; flex-direction:column; gap:0.75rem; list-style-type:none; padding:0;">
+                <!-- Savings advice list -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: REPORTS CENTER
+           ========================================== -->
+      <section class="dashboard-tab" id="tab-reports">
+        <div class="table-panel" style="max-width: 600px; margin: 0 auto;">
+          <div class="panel-header" style="margin-bottom: 1.5rem; border-bottom:1px solid var(--panel-border); padding-bottom: 1rem;">
+            <h3>Download Statement Reports</h3>
+          </div>
+          <form id="exportReportForm">
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+              <p style="color:var(--text-secondary); font-size:0.9rem;">
+                Filter statement entries by setting custom date limits, then export the file in the format of your choice.
+              </p>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="reportStartDate">Start Date</label>
+                  <input type="date" id="reportStartDate" class="form-control" style="padding-left:1rem;">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="reportEndDate">End Date</label>
+                  <input type="date" id="reportEndDate" class="form-control" style="padding-left:1rem;">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label for="reportCategory">Category Filter</label>
+                <select id="reportCategory" class="filter-select" style="width:100%; padding:0.85rem;">
+                  <option value="">All Categories</option>
+                </select>
+              </div>
+              
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-top:1rem;">
+                <button type="button" class="action-btn" id="exportCsvBtn" style="justify-content:center; border-color:var(--accent-gold); color:var(--accent-gold);">
+                  <i class="fa-solid fa-file-csv"></i> Download CSV
+                </button>
+                <button type="button" class="action-btn primary" id="exportPdfBtn" style="justify-content:center;">
+                  <i class="fa-solid fa-file-pdf"></i> Download PDF
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================
+       MODALS
+       ========================================== -->
+  
+  <!-- Add Income Modal -->
+  <div class="modal-overlay" id="incomeModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add Income Record</h3>
+        <i class="fa-solid fa-xmark modal-close" id="closeIncomeModal"></i>
+      </div>
+      <form id="addIncomeForm">
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="incomeAmount">Amount (INR)</label>
+            <input type="number" id="incomeAmount" class="form-control" style="padding-left:1rem;" placeholder="e.g. 50000" min="0.01" step="0.01" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="incomeCategory">Source/Category</label>
+            <select id="incomeCategory" class="filter-select" style="width:100%; padding:0.85rem;" required>
+              <option value="Salary">Salary</option>
+              <option value="Investments">Investments</option>
+              <option value="Business">Business</option>
+              <option value="Gifts">Gifts</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="incomeDate">Date</label>
+            <input type="date" id="incomeDate" class="form-control" style="padding-left:1rem;" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="incomeDesc">Description</label>
+            <input type="text" id="incomeDesc" class="form-control" style="padding-left:1rem;" placeholder="e.g. Monthly corporate payout">
+          </div>
+          <button type="submit" class="action-btn primary" style="justify-content:center; margin-top:0.5rem;">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add/Edit Expense Modal -->
+  <div class="modal-overlay" id="expenseModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="expenseModalTitle">Add Expense Record</h3>
+        <i class="fa-solid fa-xmark modal-close" id="closeExpenseModal"></i>
+      </div>
+      <form id="addExpenseForm">
+        <input type="hidden" id="editExpenseId">
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="expenseAmount">Amount (INR)</label>
+            <input type="number" id="expenseAmount" class="form-control" style="padding-left:1rem;" placeholder="e.g. 1500" min="0.01" step="0.01" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="expenseCategory">Category</label>
+            <select id="expenseCategory" class="filter-select" style="width:100%; padding:0.85rem;" required>
+              <option value="Food">Food</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Fuel">Fuel</option>
+              <option value="Rent">Rent</option>
+              <option value="Bills">Bills</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Travel">Travel</option>
+              <option value="Medical">Medical</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="expenseDate">Date</label>
+            <input type="date" id="expenseDate" class="form-control" style="padding-left:1rem;" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="expenseDesc">Description</label>
+            <input type="text" id="expenseDesc" class="form-control" style="padding-left:1rem;" placeholder="e.g. Dinner with friends">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="expensePayment">Payment Method</label>
+            <select id="expensePayment" class="filter-select" style="width:100%; padding:0.85rem;" required>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="expenseNotes">Notes / Details</label>
+            <textarea id="expenseNotes" class="form-control" style="padding-left:1rem; height:80px; resize:none;" placeholder="Extra details..."></textarea>
+          </div>
+          <button type="submit" class="action-btn primary" style="justify-content:center; margin-top:0.5rem;">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Financial Health Score Details Modal -->
+  <div class="modal-overlay" id="healthModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>AI Financial Audit Report</h3>
+        <i class="fa-solid fa-xmark modal-close" id="closeHealthModal"></i>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1.5rem;">
+          <div class="radial-score-bar" style="width:80px; height:80px;" id="modalHealthConic">
+            <span class="radial-score-value" style="font-size:1.5rem;" id="modalHealthScoreText">--</span>
+          </div>
+          <div>
+            <h4 style="font-weight:700; font-size:1.1rem;" id="modalHealthStatus">Loading Report...</h4>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">Score calculated out of 100</span>
+          </div>
+        </div>
+        
+        <div>
+          <h5 style="color:var(--accent-emerald); font-weight:600; font-size:0.9rem; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.5px;">Strengths</h5>
+          <ul id="healthStrengthsList" style="padding-left:1.25rem; font-size:0.9rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:0.4rem;">
+            <!--Strengths list-->
+          </ul>
+        </div>
+        
+        <div>
+          <h5 style="color:var(--accent-coral); font-weight:600; font-size:0.9rem; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.5px;">Improvement Areas</h5>
+          <ul id="healthImprovementsList" style="padding-left:1.25rem; font-size:0.9rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:0.4rem;">
+            <!--Improvements list-->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/charts.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/expenses.js"></script>
+  <script src="../js/budgets.js"></script>
+  <script src="../js/ai.js"></script>
+  <script src="../js/reports.js"></script>
+</body>
+</html>

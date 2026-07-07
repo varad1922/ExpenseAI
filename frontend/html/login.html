@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - ExpenseAI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="brand-header">
+      <i class="fa-solid fa-brain-circuit"></i>
+      <h1>ExpenseAI</h1>
+      <p>Smart Personal Finance & Budget Planner</p>
+    </div>
+
+    <div id="alertBox" class="alert" style="display: none;"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fa-regular fa-envelope"></i>
+          <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="auth-btn">Sign In</button>
+    </form>
+
+    <!-- Forgot Password Toggle Form (hidden by default) -->
+    <form id="forgotForm" style="display: none; margin-top: 1rem;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Reset Password</h3>
+      <div class="form-group">
+        <label for="forgotEmail">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fa-regular fa-envelope"></i>
+          <input type="email" id="forgotEmail" class="form-control" placeholder="name@example.com" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="forgotNewPassword">New Password</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="forgotNewPassword" class="form-control" placeholder="Enter new password" required>
+        </div>
+      </div>
+      <button type="submit" class="auth-btn" style="margin-bottom: 1rem;">Reset and Log In</button>
+      <a href="#" id="backToLogin" class="auth-link">Back to Sign In</a>
+    </form>
+
+    <div class="auth-footer" id="authFooter">
+      <p>Don't have an account? <a href="register.html" class="auth-link">Register</a></p>
+      <p style="margin-top: 0.5rem;"><a href="#" id="toggleForgot" class="auth-link">Forgot Password?</a></p>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+</body>
+</html>
