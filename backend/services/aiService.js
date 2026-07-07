@@ -200,15 +200,33 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
   if (income === 0 && expense > 0) {
     return {
       score: 10,
-      strengths: ['Expense Recording Active: You are logging payouts diligently.'],
+      strengths: [`Logged Expenses: Registered ₹${expense.toFixed(2)} in total expenditures.`],
       improvements: [
-        'No Income Registered: Add your salary or investments source to offset deficit.',
-        'Limit Non-Essential Debts: Total balance is negative due to zero earnings context.'
+        `Deficit Cash Flow: Active monthly deficit of -₹${expense.toFixed(2)} due to ₹0.00 income.`,
+        'Add Monthly Salary: Log an income source to calculate proper savings rates.'
+      ]
+    };
+  }
+
+  // Edge case: Income but no expenses
+  if (income > 0 && expense === 0) {
+    return {
+      score: 95,
+      strengths: [
+        `100% Savings Rate: Saved the entire ₹${income.toFixed(2)} of monthly income.`,
+        'Zero Outgoings: No expenditures recorded in database for this cycle.'
+      ],
+      improvements: [
+        'Log First Purchase: Record transactions to check category spending ratios.',
+        `Category Targets: Establish category budgets to protect your ₹${income.toFixed(2)} balance.`
       ]
     };
   }
 
   const budgetRatio = expense / income;
+  const netSavings = income - expense;
+  const savingsPct = Math.round((netSavings / income) * 100);
+  const expensePct = Math.round((expense / income) * 100);
   
   // Calculate baseline score
   let score = 75;
@@ -219,25 +237,33 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
   score -= exceededCount * 5;
   score = Math.max(10, Math.min(100, score));
 
-  if (budgetRatio < 0.5) {
-    strengths.push('Excellent Savings Rate: You save more than 50% of your earnings.');
-  } else if (budgetRatio < 0.8) {
-    strengths.push('Healthy Spending Balance: You maintain positive net savings.');
+  // Populate dynamic strengths and improvements using exact figures
+  if (netSavings > 0) {
+    strengths.push(`Positive Cash Flow: Saved ₹${netSavings.toFixed(2)} (${savingsPct}% of earnings) this cycle.`);
   } else {
-    improvements.push('Low Net Savings: Try saving at least 20% of your income.');
+    improvements.push(`Deficit Cash Flow: Spent ₹${Math.abs(netSavings).toFixed(2)} more than you earned this cycle.`);
   }
 
   if (exceededCount === 0) {
-    strengths.push('Strict Budget Discipline: None of your category budgets were exceeded.');
+    strengths.push('Budget Discipline: 0 categories exceeded their allocated budget limits.');
   } else {
-    improvements.push(`Budget Overruns: You exceeded ${exceededCount} budget threshold(s) this month.`);
+    improvements.push(`Budget Overruns: Exceeded limits in ${exceededCount} categories.`);
   }
 
-  if (strengths.length < 2) {
-    strengths.push('Consistent Recording: Keeping track of transactions is the first step to wealth.');
+  if (expensePct > 0) {
+    if (expensePct <= 50) {
+      strengths.push(`Optimized Expenditure: Expenses consume only ${expensePct}% of total income.`);
+    } else {
+      improvements.push(`High Expenditure: Expenses consume ${expensePct}% of your earnings (aim for under 50%).`);
+    }
   }
-  if (improvements.length < 2) {
-    improvements.push('Investments Allocation: Consider routing a portion of savings into mutual funds or gold.');
+
+  // Suggest concrete savings/investment allocation based on actual net savings
+  if (netSavings > 0) {
+    const recommendedInvestment = netSavings * 0.20;
+    improvements.push(`Investment Allocation: Recommended routing ₹${recommendedInvestment.toFixed(2)} (20% of net savings) to mutual funds or emergency deposits.`);
+  } else {
+    improvements.push(`Halt Non-Essentials: Immediately pause discretionary spending to recover the -₹${Math.abs(netSavings).toFixed(2)} deficit.`);
   }
 
   return {
