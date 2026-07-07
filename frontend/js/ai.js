@@ -53,7 +53,8 @@ async function openHealthScoreModal() {
     document.getElementById('modalHealthConic').style.background = `conic-gradient(var(--accent-gold) 0% ${score}%, rgba(255, 255, 255, 0.05) ${score}% 100%)`;
 
     let statusText = 'Fair Health';
-    if (score >= 85) statusText = 'Excellent Financial Standing 🌟';
+    if (score === 0) statusText = 'No Transaction Data ⚠️';
+    else if (score >= 85) statusText = 'Excellent Financial Standing 🌟';
     else if (score >= 70) statusText = 'Good Balance 👍';
     else if (score >= 50) statusText = 'Average Balance ⚖️';
     else statusText = 'Critical Deficit ⚠️';

@@ -209,7 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('healthScoreText').textContent = score;
       
       let statusText = 'Fair';
-      if (score >= 85) statusText = 'Excellent 🌟';
+      if (score === 0) statusText = 'No Data ⚠️';
+      else if (score >= 85) statusText = 'Excellent 🌟';
       else if (score >= 70) statusText = 'Healthy 👍';
       else if (score >= 50) statusText = 'Average ⚖️';
       else statusText = 'Needs Attention ⚠️';
