@@ -161,12 +161,12 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
         Total Expenses: ₹${expense.toFixed(2)}
         Number of exceeded category budgets: ${exceededCount}
         
-        CRITICAL: If both Total Income and Total Expenses are exactly 0, the score MUST be 0 and the strengths/improvements should explain that no transactions are recorded yet.
+        CRITICAL: If both Total Income and Total Expenses are exactly 0, the score MUST be 0, and the strengths MUST be exactly ["No transaction history recorded yet."] and improvements MUST be exactly ["Please record income and expense logs to generate audits."].
         
         Return a JSON object with:
         1. "score": An integer between 0 and 100.
-        2. "strengths": An array of 2 bullet points highlighting positive trends (e.g. "Low spending relative to income").
-        3. "improvements": An array of 2 bullet points highlighting areas of improvement.
+        2. "strengths": An array of bullet points.
+        3. "improvements": An array of bullet points.
         
         Only return raw JSON.
       `;
@@ -191,11 +191,8 @@ exports.calculateFinancialHealthScore = async (income, expense, budgetsStatus) =
   if (income === 0 && expense === 0) {
     return {
       score: 0,
-      strengths: ['Financial Portal Initialized: Your tracking environment is ready.'],
-      improvements: [
-        'Record Monthly Income: Set your base earnings limit to calculate savings ratios.',
-        'Track First Expense: Log your recent payouts or purchases to calculate score trends.'
-      ]
+      strengths: ['No transaction history recorded yet.'],
+      improvements: ['Please record income and expense logs to generate audits.']
     };
   }
 
